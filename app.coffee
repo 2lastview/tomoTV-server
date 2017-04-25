@@ -4,25 +4,31 @@ app = express()
 config = require "./config"
 
 Seeder = require "./src/seeder"
-seeder = new Seeder config.channels
+
+channelGenerator = require "./src/channelGenerator"
 
 module.exports =
   run: ->
-    app.use (req, res, next) ->
-      res.header("Access-Control-Allow-Origin", "*")
-      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
-      next()
+    # generate channels
+    channelGenerator.generate (err, channels) ->
+      if err?
+        throw err
 
-    app.get "/channels", (req, res) ->
-      res.status(200).json seeder.getSeedingChannels()
+      # start seeder
+      seeder = new Seeder channels
+      seeder.start ->
 
-    # start seeder
-    seeder.start ->
-      console.log "done with seeding"
-      console.log JSON.stringify config.channels, false, 4
+        # create routes
+        app.use (req, res, next) ->
+          res.header("Access-Control-Allow-Origin", "*")
+          res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+          next()
 
-      # start server
-      app.listen config.port, ->
-        console.log "server started and running on port #{config.port}"
+        app.get "/channels", (req, res) ->
+          res.status(200).json seeder.getSeedingChannels()
+
+        # start server
+        app.listen config.port, ->
+          console.log "server started and running on port #{config.port}"
 
 

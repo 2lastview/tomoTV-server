@@ -14,6 +14,37 @@ _fullPaths = (p, filenames) ->
 
   return paths
 
+# ------------- encode ------------- #
+
+__encode = (videoPaths, codec="libx264", resolution="640x?", cb) ->
+  async.eachSeries videoPaths, (videoPath, asyncCb) ->
+    ffmpeg()
+
+      .on "start", (cmdline) ->
+        console.log "Command line: #{cmdline}"
+
+      .on "progress", (progress) ->
+        console.log "progress to encode files:\n #{JSON.stringify progress, false, 4}"
+
+      .on "error", (err) ->
+        return asyncCb err
+
+      .on "end", ->
+        return asyncCb()
+
+      .input videoPath
+      .output "#{videoPath}.mp4"
+      .videoCodec codec
+      .audioCodec "copy"
+      .size resolution
+      .videoBitrate 200, false
+      .run()
+  , (err) ->
+    if err?
+      return cb err
+
+    cb()
+
 # ------------- merge ------------- #
 
 __createTsFiles = (videoPaths, cb) ->
@@ -65,8 +96,8 @@ __concat = (videoPaths, outputPath, cb) ->
     .on "end", ->
       return cb()
 
-    .input(inputNamesFormatted)
-    .output(outputPath)
+    .input inputNamesFormatted
+    .output outputPath
     .videoCodec "copy"
     .audioCodec "copy"
     .run()
@@ -148,6 +179,11 @@ meta = (videoPaths, mergedPath, outputPath) ->
 
     console.log "finished generating meta file at #{outputPath}"
 
+encode = (videoPaths, codec, resolution) ->
+  __encode videoPaths, codec, resolution, (err) ->
+    if err?
+      return console.log "ERROR in __encode:", err.message
+
 # ------------- commander ------------- #
 
 list = (val) ->
@@ -196,6 +232,27 @@ commander
   else
     files = fs.readdirSync __dirname
     meta _fullPaths(__dirname, files), command.merged_path, commander.output
+
+commander
+.command "encode"
+.description "encode all video files"
+.option "-c, --codec <codec>", "Codec to be used for encoding"
+.option "-r, --resolution <resolution>", "Resolution to be used for encoding"
+.action (command) ->
+
+  #
+  if commander.folder?
+    files = fs.readdirSync commander.folder
+    encode _fullPaths(commander.folder, files), command.codec, command.resolution
+
+  #
+  else if commander.paths?.length > 0
+    encode commander.paths, command.codec, command.resolution
+
+  #
+  else
+    files = fs.readdirSync __dirname
+    encode _fullPaths(__dirname, files), command.codec, command.resolution
 
 commander.parse process.argv
 

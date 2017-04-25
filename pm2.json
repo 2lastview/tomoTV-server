@@ -1,0 +1,10 @@
+{
+  "apps": [
+    {
+      "name": "tomotv-server",
+      "script": "./bin/run.coffee",
+      "log_date_format": "YYYY-MM-DD HH:mm Z",
+      "exec_interpreter": "coffee"
+    }
+  ]
+}
