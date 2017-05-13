@@ -4,7 +4,7 @@ async = require "async"
 ffmpeg = require "fluent-ffmpeg"
 ptn = require "parse-torrent-name"
 readdir = require "readdir-absolute"
-uuidV4 = require "uuid/V4"
+uuidV4 = require("uuid").v4
 
 config = require "../config"
 
