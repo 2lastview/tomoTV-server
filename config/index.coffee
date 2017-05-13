@@ -1,5 +1,6 @@
 module.exports =
 
+  # port
   port: 2000
 
   # public directory with shows
