@@ -29,6 +29,7 @@ module.exports =
       .addOptions ["-c:a", "#{options.audioCodec}"]
       .addOptions ["-b:a", "128k"]
       .addOptions ["-f", "mp4"]
+      .addOptions ["-strict", "-2"]
 
       .on "start", (cmdline) ->
         console.log "Command line pass 1: #{cmdline}"
@@ -56,6 +57,7 @@ module.exports =
         .addOptions ["-passlogfile", dirname]
         .addOptions ["-c:a", "#{options.audioCodec}"]
         .addOptions ["-b:a", "128k"]
+        .addOptions ["-strict", "-2"]
 
         .on "start", (cmdline) ->
           console.log "Command line pass 2: #{cmdline}"
