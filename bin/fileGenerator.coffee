@@ -284,10 +284,10 @@ commander
 .command "encode"
 .description "encode all video files"
 .option "-vc, --video_codec <codec>", "Codec to be used for video encoding"
-.option "-ac, --video_codec <codec>", "Codec to be used for audio encoding"
+.option "-ac, --audio_codec <codec>", "Codec to be used for audio encoding"
 .option "-r, --resolution <resolution>", "Resolution to be used for encoding"
 .option "-a, --aspect <aspect>", "Aspect ratio to be used for encoding"
-.option "-vb, --video_bitrate <codec>", "Bitrate to be used for video encoding"
+.option "-vb, --video_bitrate <bitrate>", "Bitrate to be used for video encoding"
 .action (command) ->
 
   options =

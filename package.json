@@ -17,6 +17,7 @@
     "mediasource": "^2.1.3",
     "moment": "^2.18.1",
     "parse-torrent-name": "^0.5.4",
+    "readdir-absolute": "^1.0.1",
     "request": "^2.81.0",
     "single-line-log": "^1.1.2",
     "webtorrent-hybrid": "^1.0.6"
