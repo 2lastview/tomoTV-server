@@ -32,7 +32,9 @@ commander
 
   #
   if commander.paths?.length > 0
-    options.videoPaths = commander.paths
+    options.inputPaths = commander.paths
+    options.outputPath = commander.output
+
     encode.run options, (err) ->
       console.log err
 

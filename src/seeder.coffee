@@ -12,6 +12,9 @@ class Seeder
 
       # seed this folder
       client.seed channel.seed, (torrent) =>
+
+        console.log torrent
+
         channel.magnetURI = torrent.magnetURI
         @seedingChannels.push channel
         channelCb()
