@@ -45,7 +45,7 @@ module.exports =
       .on "end", ->
         console.log "end pass 1"
 
-        output = "#{path.join options.outputPath, basename}_#{options.videoCodec}_#{options.resolution}_#{options.aspect}_#{options.videoBitrate}k_#{options.audioCodec}#{extname}"
+        output = "#{path.join options.outputPath, basename}_#{options.videoCodec}_#{options.resolution}_#{options.aspect}_#{options.videoBitrate}k_#{options.audioCodec}.mp4"
 
         new ffmpeg(source: videoPath)
         .addOptions ["-c:v", "#{options.videoCodec}"]

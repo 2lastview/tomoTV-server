@@ -20,6 +20,7 @@
     "readdir-absolute": "^1.0.1",
     "request": "^2.81.0",
     "single-line-log": "^1.1.2",
+    "uuid": "^3.0.1",
     "webtorrent-hybrid": "^1.0.6"
   }
 }

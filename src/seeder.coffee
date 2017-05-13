@@ -1,4 +1,3 @@
-os_path = require "path"
 async = require "async"
 Webtorrent = require "webtorrent-hybrid"
 client = new Webtorrent()
