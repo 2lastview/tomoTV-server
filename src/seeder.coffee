@@ -8,7 +8,11 @@ class Seeder
     @seedingChannels = []
 
   start: (cb) ->
+    console.log @channels
+
     async.eachSeries @channels, (channel, channelCb) =>
+
+      console.log channel
 
       # seed this folder
       client.seed channel.seed, (torrent) =>
@@ -20,6 +24,7 @@ class Seeder
         channelCb()
 
     , =>
+      console.log @seedingChannels
       cb()
 
   getSeedingChannels: ->
