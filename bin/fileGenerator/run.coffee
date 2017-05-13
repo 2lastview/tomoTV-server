@@ -33,7 +33,8 @@ commander
   #
   if commander.paths?.length > 0
     options.videoPaths = commander.paths
-    encode.run options
+    encode.run options, (err) ->
+      console.log err
 
   #
   else if commander.input?
@@ -44,7 +45,8 @@ commander
       options.inputPaths = files
       options.outputPath = commander.output
 
-      encode.run options
+      encode.run options, (err) ->
+        console.log err
 
   #
   else
@@ -55,6 +57,7 @@ commander
       options.inputPaths = files
       options.outputPath = commander.output
 
-      encode.run options
+      encode.run options, (err) ->
+        console.log err
 
 commander.parse process.argv
