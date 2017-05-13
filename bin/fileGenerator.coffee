@@ -16,29 +16,76 @@ _fullPaths = (p, filenames) ->
 
 # ------------- encode ------------- #
 
-__encode = (videoPaths, codec="libx264", resolution="640x?", cb) ->
-  async.eachSeries videoPaths, (videoPath, asyncCb) ->
-    ffmpeg()
+__encode = (options, cb) ->
+  console.log "encoding options:\n #{JSON.stringify options, false, 4}"
+
+  async.eachSeries options.videoPaths, (videoPath, asyncCb) ->
+    if /.*\.DS_Store.*/.test videoPath
+      return asyncCb()
+
+    dirname = path.dirname videoPath
+    extname = path.extname videoPath
+    basename = path.basename videoPath, extname
+
+    new ffmpeg(source: videoPath)
+    .addOptions ["-y"]
+    .addOptions ["-c:v", "#{options.videoCodec}"]
+    .addOptions ["-filter:v", "scale=#{options.resolution}"]
+    .addOptions ["-aspect", "#{options.aspect}"]
+    .addOptions ["-preset", "medium"]
+    .addOptions ["-b:v", "#{options.videoBitrate}k"]
+    .addOptions ["-pass", "1"]
+    .addOptions ["-passlogfile", dirname]
+    .addOptions ["-c:a", "#{options.audioCodec}"]
+    .addOptions ["-b:a", "128k"]
+    .addOptions ["-f", "mp4"]
+
+    .on "start", (cmdline) ->
+      console.log "Command line pass 1: #{cmdline}"
+
+    .on "progress", (progress) ->
+      console.log "progress to encode files pass 1:\n #{JSON.stringify progress, false, 4}"
+      console.log basename
+
+    .on "error", (err) ->
+      console.log "error pass 1"
+      return asyncCb err
+
+    .on "end", ->
+      console.log "end pass 1"
+
+      output = "#{path.join dirname, basename}_#{options.videoCodec}_#{options.resolution}_#{options.aspect}#{options.videoBitrate}k_#{options.audioCodec}#{extname}"
+
+      new ffmpeg(source: videoPath)
+      .addOptions ["-c:v", "#{options.videoCodec}"]
+      .addOptions ["-filter:v", "scale=#{options.resolution}"]
+      .addOptions ["-aspect", "#{options.aspect}"]
+      .addOptions ["-preset", "medium"]
+      .addOptions ["-b:v", "#{options.videoBitrate}k"]
+      .addOptions ["-pass", "2"]
+      .addOptions ["-passlogfile", dirname]
+      .addOptions ["-c:a", "#{options.audioCodec}"]
+      .addOptions ["-b:a", "128k"]
 
       .on "start", (cmdline) ->
-        console.log "Command line: #{cmdline}"
+        console.log "Command line pass 2: #{cmdline}"
 
       .on "progress", (progress) ->
-        console.log "progress to encode files:\n #{JSON.stringify progress, false, 4}"
+        console.log "progress to encode files pass 2:\n #{JSON.stringify progress, false, 4}"
+        console.log basename
 
       .on "error", (err) ->
+        console.log "error pass 2"
         return asyncCb err
 
       .on "end", ->
+        console.log "end pass 2"
         return asyncCb()
 
-      .input videoPath
-      .output "#{videoPath}.mp4"
-      .videoCodec codec
-      .audioCodec "copy"
-      .size resolution
-      .videoBitrate 200, false
-      .run()
+      .saveToFile output
+
+    .saveToFile "/dev/null"
+
   , (err) ->
     if err?
       return cb err
@@ -179,8 +226,8 @@ meta = (videoPaths, mergedPath, outputPath) ->
 
     console.log "finished generating meta file at #{outputPath}"
 
-encode = (videoPaths, codec, resolution) ->
-  __encode videoPaths, codec, resolution, (err) ->
+encode = (options) ->
+  __encode options, (err) ->
     if err?
       return console.log "ERROR in __encode:", err.message
 
@@ -236,23 +283,36 @@ commander
 commander
 .command "encode"
 .description "encode all video files"
-.option "-c, --codec <codec>", "Codec to be used for encoding"
+.option "-vc, --video_codec <codec>", "Codec to be used for video encoding"
+.option "-ac, --video_codec <codec>", "Codec to be used for audio encoding"
 .option "-r, --resolution <resolution>", "Resolution to be used for encoding"
+.option "-a, --aspect <aspect>", "Aspect ratio to be used for encoding"
+.option "-vb, --video_bitrate <codec>", "Bitrate to be used for video encoding"
 .action (command) ->
+
+  options =
+    videoCodec: command.video_codec or "libx264"
+    audioCodec: command.audio_codec or "aac"
+    resolution: command.resolution or "-1:480"
+    aspect: command.aspect or "16:9"
+    videoBitrate: command.video_bitrate or 256
 
   #
   if commander.folder?
     files = fs.readdirSync commander.folder
-    encode _fullPaths(commander.folder, files), command.codec, command.resolution
+    options.videoPaths = _fullPaths(commander.folder, files) or []
+    encode options
 
   #
   else if commander.paths?.length > 0
-    encode commander.paths, command.codec, command.resolution
+    options.videoPaths = commander.paths or []
+    encode options
 
   #
   else
     files = fs.readdirSync __dirname
-    encode _fullPaths(__dirname, files), command.codec, command.resolution
+    options.videoPaths = _fullPaths(commander.folder, files) or []
+    encode options
 
 commander.parse process.argv
 

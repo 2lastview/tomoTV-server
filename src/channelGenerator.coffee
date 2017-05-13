@@ -12,6 +12,10 @@ module.exports =
 
     async.eachSeries fs.readdirSync(PUBLIC), (channelPath, channelCb) ->
 
+      if /.*\.DS_Store.*/.test channelPath
+        fs.unlinkSync path.join PUBLIC, channelPath
+        return channelCb()
+
       channel =
         name: path.basename(channelPath)
         id: path.basename(channelPath).replace(/\s/g, "").toLowerCase()
@@ -24,6 +28,10 @@ module.exports =
       cutsTotal = 0
 
       async.eachSeries fs.readdirSync(path.join PUBLIC, channelPath), (videoPath, videoCb) ->
+
+        if /.*\.DS_Store.*/.test videoPath
+          fs.unlinkSync path.join(PUBLIC, channelPath, videoPath)
+          return videoCb()
 
         ffmpeg.ffprobe path.join(PUBLIC, channelPath, videoPath), (err, metadata) ->
           if err?
