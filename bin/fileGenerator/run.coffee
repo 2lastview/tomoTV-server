@@ -27,7 +27,7 @@ commander
     videoCodec: command["video_codec"] or "libx264"
     audioCodec: command["audio_codec"] or "aac"
     videoBitrate: command["video_bitrate"] or 256
-    resolution: command["resolution"] or "-1:480"
+    resolution: command["resolution"] or "-2:480"
     aspect: command["aspect"] or "16:9"
 
   #
