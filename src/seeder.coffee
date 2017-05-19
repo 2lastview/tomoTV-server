@@ -8,23 +8,25 @@ class Seeder
     @seedingChannels = []
 
   start: (cb) ->
-    console.log @channels
-
     async.eachSeries @channels, (channel, channelCb) =>
 
-      console.log channel
+      console.log "Start seeding channel: #{channel.name}"
 
       # seed this folder
       client.seed channel.seed, (torrent) =>
-
-        console.log torrent
-
         channel.magnetURI = torrent.magnetURI
         @seedingChannels.push channel
+
+        console.log "Done seeding channel: #{channel.name}"
+
         channelCb()
 
     , =>
-      console.log @seedingChannels
+
+      console.log "-------------------------------------------"
+      console.log JSON.stringify @seedingChannels, false, 4
+      console.log "-------------------------------------------"
+
       cb()
 
   getSeedingChannels: ->
