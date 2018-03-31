@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "serve": "node --max-old-space-size=8192 bin/run.js"
   },
   "author": "",
   "license": "ISC",

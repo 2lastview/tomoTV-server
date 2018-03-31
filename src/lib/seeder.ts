@@ -1,4 +1,4 @@
-import { Webtorrent } from "webtorrent-hybrid";
+const WebTorrent = require("webtorrent-hybrid");
 
 export class Seeder {
 
@@ -7,7 +7,7 @@ export class Seeder {
     private seedingChannels;
 
     constructor() {
-        this.torrentClient = new Webtorrent();
+        this.torrentClient = new WebTorrent();
         this.seedingChannels = [];
     }
 
