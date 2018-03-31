@@ -12,5 +12,7 @@
           "es2015"
         ]
     },
-    "files": []
+    "files": [
+        "src/server.ts"
+    ]
 }
